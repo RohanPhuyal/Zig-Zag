@@ -33,6 +33,8 @@ public class BallController : MonoBehaviour
             {
                 rb.linearVelocity = new Vector3(speed, 0, 0);
                 started = true;
+                
+                GameManager.instance.StartGame();
             }
         }
         Debug.DrawRay(transform.position, Vector3.down, Color.red);
@@ -72,5 +74,6 @@ public class BallController : MonoBehaviour
 
         Camera.main.GetComponent<CameraFollow>().gameOver = true;
         platformspawn.GetComponent<PlatformSpawner>().gameOver = true;
+        GameManager.instance.GameOver();
     }
 }
