@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        Difficulty.instance.toggle.gameObject.SetActive(false);
         UIManager.instance.GameStart();
         ScoreManager.instance.StartScore();
         GameObject.Find("PlatformSpawner").GetComponent<PlatformSpawner>().StartSpawningPlatforms();
@@ -33,5 +34,6 @@ public class GameManager : MonoBehaviour
     {
         UIManager.instance.GameOver();
         ScoreManager.instance.StopScore();
+        GameObject.Find("PlatformSpawner").GetComponent<PlatformSpawner>().StopSpawningPlatforms();
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class PlatformSpawner : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class PlatformSpawner : MonoBehaviour
     Vector3 lastPos;
     float size;
     public bool gameOver;
+    public ObjectPool<GameObject> platformPool;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,6 +24,11 @@ public class PlatformSpawner : MonoBehaviour
     public void StartSpawningPlatforms()
     {
         InvokeRepeating("SpawnPlatforms",0.3f,0.2f);
+    }
+
+    public void StopSpawningPlatforms()
+    {
+        CancelInvoke("SpawnPlatforms");
     }
 
     // Update is called once per frame

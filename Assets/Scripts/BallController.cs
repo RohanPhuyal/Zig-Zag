@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems; // Required for EventSystem
 
 public class BallController : MonoBehaviour
 {
@@ -22,6 +23,26 @@ public class BallController : MonoBehaviour
     {
         started = false;
         gameOver = false;
+        TrailEffect();
+    }
+
+    void TrailEffect()
+    {
+        TrailRenderer trail = gameObject.AddComponent<TrailRenderer>();
+
+        trail.time = 0.5f; // Duration the trail remains visible
+        trail.startWidth = 0.2f;
+        trail.endWidth = 0.05f;
+        trail.material = new Material(Shader.Find("Sprites/Default")); // Basic material
+
+        // Set a color gradient with transparency
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] { new GradientColorKey(Color.white, 0.0f), new GradientColorKey(Color.white, 1.0f) },
+            new GradientAlphaKey[] { new GradientAlphaKey(0.5f, 0.0f), new GradientAlphaKey(0.0f, 1.0f) } // 50% opacity to 0%
+        );
+
+        trail.colorGradient = gradient;
     }
 
     // Update is called once per frame
@@ -29,7 +50,7 @@ public class BallController : MonoBehaviour
     {
         if (!started)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
             {
                 rb.linearVelocity = new Vector3(speed, 0, 0);
                 started = true;
@@ -48,6 +69,11 @@ public class BallController : MonoBehaviour
             SwitchDirection();
         }
     }
+    private bool IsPointerOverUI()
+    {
+        return EventSystem.current.IsPointerOverGameObject();
+    }
+    
 
     void SwitchDirection()
     {
