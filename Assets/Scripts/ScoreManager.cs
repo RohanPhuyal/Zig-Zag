@@ -6,6 +6,10 @@ public class ScoreManager : MonoBehaviour
     public static ScoreManager instance;
     public int score;
     public int highScore;
+    private int currentLevel;
+    
+    private int levelThreshold = 20; // Score required for the next level
+    private int currentLevelScore;
 
     void Awake()
     {
@@ -18,8 +22,12 @@ public class ScoreManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        score = 0;
+        currentLevelScore = 0;
+        currentLevel = PlayerPrefs.GetInt("currentLevel", 1); // Load the current level, default to level 1
+        UIManager.instance.setLevel(currentLevel);
         PlayerPrefs.SetInt("score", score);
+        PlayerPrefs.SetInt("currentLevel", currentLevel); // Ensure the level starts correctly
+        score = currentLevel*levelThreshold;
     }
 
     // Update is called once per frame
@@ -31,6 +39,9 @@ public class ScoreManager : MonoBehaviour
     void IncrementScore()
     {
         score += 1;
+        currentLevelScore += 1;
+        // Check if the score exceeds the level milestone
+        CheckLevelCompletion();
     }
 
     public void StartScore()
@@ -55,6 +66,22 @@ public class ScoreManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("highScore", score);
             highScore = score;
+        }
+    }
+    
+    // Check if the player has passed the level threshold
+    void CheckLevelCompletion()
+    {
+        int nextLevelThreshold = currentLevel * levelThreshold;
+
+        if (currentLevelScore >= nextLevelThreshold)
+        {
+            // Level is complete, so update the current level
+            currentLevel++;
+            PlayerPrefs.SetInt("currentLevel", currentLevel); // Save the current level progress
+            Debug.Log("LEVEL UP: "+currentLevel);
+            // Optionally display a "level complete" message or update UI
+            GameObject.Find("Ball").GetComponent<BallController>().LevelUp();
         }
     }
 }

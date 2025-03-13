@@ -7,18 +7,19 @@ public class CameraFollow : MonoBehaviour
 
     public float lerpRate;
     public bool gameOver;
-
+    public bool levelUp;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         offset = ball.transform.position - transform.position;
         gameOver = false;
+        levelUp = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!gameOver)
+        if (!gameOver && !levelUp)
         {
             Follow();
         }

@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems; // Required for EventSystem
+using UnityEngine.EventSystems;
+using UnityEngine.Pool; // Required for EventSystem
 
 public class BallController : MonoBehaviour
 {
@@ -14,6 +16,10 @@ public class BallController : MonoBehaviour
 
     bool gameOver;
 
+    bool levelUp;
+    
+    private ObjectPool<GameObject> particlePool;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -23,7 +29,18 @@ public class BallController : MonoBehaviour
     {
         started = false;
         gameOver = false;
+        levelUp = false;
         TrailEffect();
+        // Initialize Particle Pool
+        particlePool = new ObjectPool<GameObject>(
+            createFunc: () => Instantiate(particle),
+            actionOnGet: obj => obj.SetActive(true),
+            actionOnRelease: obj => obj.SetActive(false),
+            actionOnDestroy: obj => Destroy(obj),
+            collectionCheck: false,
+            defaultCapacity: 5,
+            maxSize: 5
+        );
     }
 
     void TrailEffect()
@@ -64,7 +81,7 @@ public class BallController : MonoBehaviour
             GameOver();
         }
 
-        if (Input.GetMouseButtonDown(0) && !gameOver)
+        if (Input.GetMouseButtonDown(0) && !gameOver && !levelUp)
         {
             SwitchDirection();
         }
@@ -88,10 +105,19 @@ public class BallController : MonoBehaviour
     {
         if (col.gameObject.tag == "Diamond")
         {
-            GameObject part = Instantiate(particle, col.gameObject.transform.position, Quaternion.identity) as GameObject;
-            Destroy(part,1f);
+            //GameObject part = Instantiate(particle, col.gameObject.transform.position, Quaternion.identity) as GameObject;
+            GameObject plat = particlePool.Get();
+            plat.transform.position = col.gameObject.transform.position;
+            
+            // Start a coroutine to handle delayed release
+            StartCoroutine(DelayedReleaseCoroutine(plat, 1f));
             Destroy(col.gameObject);
         }
+    }
+    private IEnumerator DelayedReleaseCoroutine(GameObject plat, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        particlePool.Release(plat);
     }
     void GameOver()
     {
@@ -101,5 +127,14 @@ public class BallController : MonoBehaviour
         Camera.main.GetComponent<CameraFollow>().gameOver = true;
         platformspawn.GetComponent<PlatformSpawner>().gameOver = true;
         GameManager.instance.GameOver();
+    }
+
+    public void LevelUp()
+    {
+        levelUp = true;
+        rb.linearVelocity = new Vector3(0, -25f, 0);
+        Camera.main.GetComponent<CameraFollow>().levelUp = true;
+        platformspawn.GetComponent<PlatformSpawner>().levelUp = true;
+        GameManager.instance.LevelUp();
     }
 }

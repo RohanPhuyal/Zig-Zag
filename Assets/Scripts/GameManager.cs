@@ -36,4 +36,11 @@ public class GameManager : MonoBehaviour
         ScoreManager.instance.StopScore();
         GameObject.Find("PlatformSpawner").GetComponent<PlatformSpawner>().StopSpawningPlatforms();
     }
+
+    public void LevelUp()
+    {
+        UIManager.instance.LevelUp();
+        ScoreManager.instance.StopScore();
+        GameObject.Find("PlatformSpawner").GetComponent<PlatformSpawner>().StopSpawningPlatforms();
+    }
 }
