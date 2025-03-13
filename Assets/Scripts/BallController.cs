@@ -69,28 +69,47 @@ public class BallController : MonoBehaviour
     {
         if (!started)
         {
+            // Mouse input
             if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
             {
                 rb.linearVelocity = new Vector3(speed, 0, 0);
                 started = true;
-                
+            
                 GameManager.instance.StartGame();
             }
+
+            // Mobile touch input
+            if (Input.touchCount > 0 && !IsPointerOverUI())
+            {
+                Touch touch = Input.GetTouch(0);
+                if (touch.phase == TouchPhase.Began)
+                {
+                    rb.linearVelocity = new Vector3(speed, 0, 0);
+                    started = true;
+                
+                    GameManager.instance.StartGame();
+                }
+            }
         }
+
         Debug.DrawRay(transform.position, Vector3.down, Color.red);
         if(!Physics.Raycast(transform.position, Vector3.down, 1f))
         {
             GameOver();
         }
 
-        if (Input.GetMouseButtonDown(0) && !gameOver && !levelUp)
+        // Mouse or touch input for direction switch
+        if ((Input.GetMouseButtonDown(0) && !gameOver && !levelUp) || 
+            (Input.touchCount > 0 && !gameOver && !levelUp && Input.GetTouch(0).phase == TouchPhase.Began))
         {
             SwitchDirection();
         }
+
         // Get ball velocity for scrolling effect
         Vector2 offset = new Vector2(Time.deltaTime * rb.linearVelocity.magnitude * speed, 0);
         ballMaterial.SetTextureOffset("_BaseMap", offset);
     }
+
     private bool IsPointerOverUI()
     {
         return EventSystem.current.IsPointerOverGameObject();
