@@ -9,6 +9,8 @@ public class BallController : MonoBehaviour
     public GameObject particle;
     [SerializeField]
     private float speed;
+    
+    public Material ballMaterial; // Assign material in Inspector
 
     Rigidbody rb;
 
@@ -85,6 +87,9 @@ public class BallController : MonoBehaviour
         {
             SwitchDirection();
         }
+        // Get ball velocity for scrolling effect
+        Vector2 offset = new Vector2(Time.deltaTime * rb.linearVelocity.magnitude * speed, 0);
+        ballMaterial.SetTextureOffset("_BaseMap", offset);
     }
     private bool IsPointerOverUI()
     {
