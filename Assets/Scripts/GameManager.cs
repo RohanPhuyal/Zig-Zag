@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -6,6 +8,10 @@ public class GameManager : MonoBehaviour
     public bool gameOver;
     public bool gameStarted;
     public Color platformColor;
+    [SerializeField]
+    private PlatformSpawner platformSpawner;
+    private float transitionDuration = 0.5f; // Time to complete color transition
+
     void Awake(){
         Application.targetFrameRate = 60;
         if (instance == null)
@@ -61,6 +67,47 @@ public class GameManager : MonoBehaviour
             objectRenderer.material.color = newColor; // Apply color to material
         }*/
     }
+    public void ChangeColor()
+    {
+        if (platformColor != null && platformSpawner != null)
+        {
+            StartCoroutine(ChangeColorRoutine());
+        }
+    }
+    private IEnumerator ChangeColorRoutine()
+    {
+        // Create a list from the keys of the dictionary to avoid modifying the collection during iteration
+        List<GameObject> platformList = new List<GameObject>(platformSpawner.allPlatforms.Keys);
+        foreach (var platform in platformList)
+        {
+            if (platform != null)
+            {
+                Renderer rend = platform.GetComponent<Renderer>();
+                if (rend != null)
+                {
+                    StartCoroutine(LerpColor(rend, platformColor, transitionDuration));
+                }
+            }
+            //yield return new WaitForSeconds(0.1f); // Delay between platforms
+            yield return null; // Delay between platforms
+        }
+    }
+
+    private IEnumerator LerpColor(Renderer rend, Color targetColor, float duration)
+    {
+        Color startColor = rend.material.color;
+        float timeElapsed = 0f;
+
+        while (timeElapsed < duration)
+        {
+            rend.material.color = Color.Lerp(startColor, targetColor, timeElapsed / duration);
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        rend.material.color = targetColor; // Ensure final color is applied
+    }
+
 
 /*public void LevelUp()
 {

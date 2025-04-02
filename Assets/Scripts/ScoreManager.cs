@@ -44,6 +44,7 @@ public class ScoreManager : MonoBehaviour
         if (score % 50 == 0)
         {
             GameManager.instance.RandomizeColorFunction();
+            GameManager.instance.ChangeColor();
         }
         
         //currentLevelScore += 1;

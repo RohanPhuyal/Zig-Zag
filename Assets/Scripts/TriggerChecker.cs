@@ -24,11 +24,14 @@ public class TriggerChecker : MonoBehaviour
         rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
         rb.useGravity = true;
         rb.isKinematic = false;
-
+        // Apply custom gravity force
+        float gravityMultiplier = 10f; // Increase this value to make gravity stronger
+        Vector3 customGravity = new Vector3(0, -9.81f * gravityMultiplier, 0); // Assuming global gravity is 9.81m/s²
+        rb.AddForce(customGravity, ForceMode.Acceleration);
         // Release platform instead of destroying it
         if (spawner != null)
         {
-            Invoke(nameof(DelayedRelease), 1f);
+            Invoke(nameof(DelayedRelease), 0.5f);
         }
     }
 
