@@ -27,7 +27,7 @@ public class PlatformSpawner : MonoBehaviour
             actionOnRelease: obj => obj.SetActive(false),
             actionOnDestroy: obj => Destroy(obj),
             collectionCheck: false,
-            defaultCapacity: 20,
+            defaultCapacity: 40,
             maxSize: 50
         );
 

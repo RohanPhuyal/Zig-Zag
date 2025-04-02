@@ -14,10 +14,12 @@ public class UIManager : MonoBehaviour
     public Text score;
     public Text highScore1;
     public Text highScore2;
-    public Text levelText;
-    public Text levelText2;
-    public Text levelText3;
+    //public Text levelText;
+    //public Text levelText2;
+    //public Text levelText3;
+    public Text currentScore;
 
+    public GameObject exit;
     void Awake()
     {
         if (instance == null)
@@ -30,7 +32,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         highScore1.text = "High Score: " + PlayerPrefs.GetInt("highScore");
-        levelText.GameObject().SetActive(true);
+        //levelText.GameObject().SetActive(true);
     }
 
     // Update is called once per frame
@@ -41,38 +43,52 @@ public class UIManager : MonoBehaviour
     public void GameStart()
     {
         tapText.SetActive(false);
+        exit.SetActive(false);
+        currentScore.gameObject.SetActive(true);
         zigzagPanel.GetComponent<Animator>().Play("panelUp");
     }
     public void GameOver()
     {
         score.text = PlayerPrefs.GetInt("score").ToString();
         highScore2.text = PlayerPrefs.GetInt("highScore").ToString();
-        levelText2.text = "Level: "+ PlayerPrefs.GetInt("currentLevel").ToString();
-        levelText.GameObject().SetActive(false);
+        //levelText2.text = "Level: "+ PlayerPrefs.GetInt("currentLevel").ToString();
+        //levelText.GameObject().SetActive(false);
+        levelUpPanel.SetActive(false);
         gameOverPanel.SetActive(true);
     }
 
-    public void LevelUp()
+    public void updateScoreUI(int score)
     {
-        int currentLevel = PlayerPrefs.GetInt("currentLevel");
-        setLevel(currentLevel);
-        levelText3.text = "Level: "+ currentLevel.ToString();
-        levelText.GameObject().SetActive(false);
-        levelUpPanel.SetActive(true);
-    }
-    
-    public void setLevel(int level)
-    {
-        levelText.text = "Level: "+level.ToString();
+        currentScore.text = "Score: "+ score.ToString();
     }
 
-    public void RestartGame()
+    public void exitGame()
     {
-        SceneManager.LoadScene(0);
+        Application.Quit();
     }
 
-    public void ContinueLevel()
-    {
-        SceneManager.LoadScene(0);
-    }
+/*public void LevelUp()
+{
+    int currentLevel = PlayerPrefs.GetInt("currentLevel");
+    setLevel(currentLevel);
+    levelText3.text = "Level: "+ currentLevel.ToString();
+    levelText.GameObject().SetActive(false);
+    gameOverPanel.SetActive(false);
+    levelUpPanel.SetActive(true);
+}
+
+public void setLevel(int level)
+{
+    levelText.text = "Level: "+level.ToString();
+}*/
+
+public void RestartGame()
+{
+    SceneManager.LoadScene(0);
+}
+
+public void ContinueLevel()
+{
+    SceneManager.LoadScene(0);
+}
 }

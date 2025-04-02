@@ -21,6 +21,7 @@ public class TriggerChecker : MonoBehaviour
     void FallDown()
     {
         rb = GetComponentInParent<Rigidbody>();
+        rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
         rb.useGravity = true;
         rb.isKinematic = false;
 

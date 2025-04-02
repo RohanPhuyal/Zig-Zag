@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Pool; // Required for EventSystem
@@ -9,8 +10,8 @@ public class BallController : MonoBehaviour
     public GameObject particle;
     [SerializeField]
     private float speed;
-    
-    public Material ballMaterial; // Assign material in Inspector
+    [SerializeField]
+    private GameObject tapText;
 
     Rigidbody rb;
 
@@ -98,20 +99,36 @@ public class BallController : MonoBehaviour
             GameOver();
         }
 
+        if (GameManager.instance.gameStarted && ScoreManager.instance.score % 500 == 0 && ScoreManager.instance.score != 0)
+        {
+            speed++;
+        }
         // Mouse or touch input for direction switch
         if ((Input.GetMouseButtonDown(0) && !gameOver && !levelUp) || 
             (Input.touchCount > 0 && !gameOver && !levelUp && Input.GetTouch(0).phase == TouchPhase.Began))
         {
             SwitchDirection();
         }
-
-        // Get ball velocity for scrolling effect
-        Vector2 offset = new Vector2(Time.deltaTime * rb.linearVelocity.magnitude * speed, 0);
-        ballMaterial.SetTextureOffset("_BaseMap", offset);
     }
 
     private bool IsPointerOverUI()
     {
+        PointerEventData eventData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject == tapText) // Check if tapText was clicked
+            {
+                return false; // Return false if clicked on tapText
+            }
+        }
+
         return EventSystem.current.IsPointerOverGameObject();
     }
     
@@ -146,6 +163,7 @@ public class BallController : MonoBehaviour
     void GameOver()
     {
         gameOver = true;
+        rb.constraints &= ~RigidbodyConstraints.FreezePositionY;
         rb.linearVelocity = new Vector3(0, -25f, 0);
 
         Camera.main.GetComponent<CameraFollow>().gameOver = true;
@@ -153,12 +171,12 @@ public class BallController : MonoBehaviour
         GameManager.instance.GameOver();
     }
 
-    public void LevelUp()
+    /*public void LevelUp()
     {
         levelUp = true;
         rb.linearVelocity = new Vector3(0, -25f, 0);
         Camera.main.GetComponent<CameraFollow>().levelUp = true;
         platformspawn.GetComponent<PlatformSpawner>().levelUp = true;
         GameManager.instance.LevelUp();
-    }
+    }*/
 }

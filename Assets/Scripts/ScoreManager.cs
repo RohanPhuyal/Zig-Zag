@@ -6,10 +6,10 @@ public class ScoreManager : MonoBehaviour
     public static ScoreManager instance;
     public int score;
     public int highScore;
-    private int currentLevel;
+    //private int currentLevel;
     
-    private int levelThreshold = 20; // Score required for the next level
-    private int currentLevelScore;
+    //private int levelThreshold = 200; // Score required for the next level
+    //private int currentLevelScore;
 
     void Awake()
     {
@@ -22,12 +22,13 @@ public class ScoreManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        currentLevelScore = 0;
-        currentLevel = PlayerPrefs.GetInt("currentLevel", 1); // Load the current level, default to level 1
-        UIManager.instance.setLevel(currentLevel);
+        score = 0;
+        //currentLevelScore = 0;
+        //currentLevel = PlayerPrefs.GetInt("currentLevel", 1); // Load the current level, default to level 1
+        //UIManager.instance.setLevel(currentLevel);
         PlayerPrefs.SetInt("score", score);
-        PlayerPrefs.SetInt("currentLevel", currentLevel); // Ensure the level starts correctly
-        score = currentLevel*levelThreshold;
+        //PlayerPrefs.SetInt("currentLevel", currentLevel); // Ensure the level starts correctly
+        //score = currentLevel*levelThreshold;
     }
 
     // Update is called once per frame
@@ -39,9 +40,15 @@ public class ScoreManager : MonoBehaviour
     void IncrementScore()
     {
         score += 1;
-        currentLevelScore += 1;
+        UIManager.instance.updateScoreUI(score);
+        if (score % 50 == 0)
+        {
+            GameManager.instance.RandomizeColorFunction();
+        }
+        
+        //currentLevelScore += 1;
         // Check if the score exceeds the level milestone
-        CheckLevelCompletion();
+        //CheckLevelCompletion();
     }
 
     public void StartScore()
@@ -70,7 +77,7 @@ public class ScoreManager : MonoBehaviour
     }
     
     // Check if the player has passed the level threshold
-    void CheckLevelCompletion()
+    /*void CheckLevelCompletion()
     {
         int nextLevelThreshold = currentLevel * levelThreshold;
 
@@ -84,4 +91,5 @@ public class ScoreManager : MonoBehaviour
             GameObject.Find("Ball").GetComponent<BallController>().LevelUp();
         }
     }
+    */
 }
