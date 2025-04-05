@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
         }
-        SetAutoQualityLevel();  // Call it when the game starts
 
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -26,7 +25,18 @@ public class GameManager : MonoBehaviour
     {
         gameOver = false;
         gameStarted = false;
-        
+        if(PlayerPrefs.HasKey("quality"))
+        {
+            Debug.Log(PlayerPrefs.GetString("quality"));
+            string selection = PlayerPrefs.GetString("quality");
+            Debug.Log("QUALITY ALREADY SET");
+            SetManualQualityLevel(selection);
+        }
+        else
+        {
+            SetAutoQualityLevel();  // Call it when the game starts
+            Debug.Log("AUTO QUALITY SET");
+        }
     }
     public void SetAutoQualityLevel()
     {
@@ -39,41 +49,88 @@ public class GameManager : MonoBehaviour
         // Check for low-end devices
         if (processorCount <= 2 && graphicsMemory <= 1024)
         {
+            Application.targetFrameRate=30;
+            UIManager.instance.graphicsQuality.value = 2;
+            PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[2].text);
             QualitySettings.SetQualityLevel(0);  // Low quality
             Debug.Log("Low quality set.");
-            SetGameResolution(720);  // Set resolution to 720p for low quality
+            SetGameResolution(480);  // Set resolution to 720p for low quality
         }
         // Check for mid-range devices
         else if (processorCount <= 4 && graphicsMemory <= 2048)
         {
+            Application.targetFrameRate=60;
+            UIManager.instance.graphicsQuality.value = 1;
+            PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[1].text);
             QualitySettings.SetQualityLevel(2);  // Medium quality
             Debug.Log("Medium quality set.");
             // Optionally, you can set medium resolution or stick to 1080p
-            SetGameResolution(1080);  // You could adjust to 1080p if you'd like for medium
+            SetGameResolution(720);  // You could adjust to 1080p if you'd like for medium
         }
         // High-end devices
         else
         {
+            Application.targetFrameRate=60;
+            UIManager.instance.graphicsQuality.value = 0;
+            PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[0].text);
+            QualitySettings.SetQualityLevel(5);  // High quality
+            Debug.Log("High quality set.");
+            SetGameResolution(1080);  // Set resolution to 1080p for high quality
+        }
+    }
+    public void SetManualQualityLevel(string value)
+    {
+        int processorCount = SystemInfo.processorCount;
+        int graphicsMemory = SystemInfo.graphicsMemorySize;
+        int screenWidth = Screen.width;
+        int screenHeight = Screen.height;
+        Debug.Log("Resolution: "+screenWidth+"x"+screenHeight);
+
+        // Check for low-end devices
+        if (value == "Low")
+        {
+            Application.targetFrameRate=30;
+            QualitySettings.SetQualityLevel(0);  // Low quality
+            Debug.Log("Low quality set.");
+            SetGameResolution(480);  // Set resolution to 720p for low quality
+        }
+        // Check for mid-range devices
+        else if (value == "Mid")
+        {
+            Application.targetFrameRate=60;
+            QualitySettings.SetQualityLevel(2);  // Medium quality
+            Debug.Log("Medium quality set.");
+            // Optionally, you can set medium resolution or stick to 1080p
+            SetGameResolution(720);  // You could adjust to 1080p if you'd like for medium
+        }
+        // High-end devices
+        else if (value == "High")
+        {
+            Application.targetFrameRate=60;
             QualitySettings.SetQualityLevel(5);  // High quality
             Debug.Log("High quality set.");
             SetGameResolution(1080);  // Set resolution to 1080p for high quality
         }
     }
 
-    private void SetGameResolution(int baseResolutionHeight)
+    private void SetGameResolution(int targetHeight)
     {
-        // Get the current aspect ratio of the device (width / height)
-        float aspectRatio = (float)Screen.width / Screen.height;
+        // Get the *native* screen width and height
+        int nativeWidth = Screen.currentResolution.width;
+        int nativeHeight = Screen.currentResolution.height;
 
-        // Calculate the corresponding width based on the desired height while maintaining the aspect ratio
-        int resolutionHeight = baseResolutionHeight;
-        int resolutionWidth = Mathf.RoundToInt(resolutionHeight * aspectRatio);  // Ensure proper rounding
+        // Calculate exact aspect ratio of the native screen
+        float aspectRatio = (float)nativeWidth / nativeHeight;
 
-        // Apply the resolution, making sure it's in portrait mode
-        Screen.SetResolution(resolutionWidth, resolutionHeight, true);
+        // Now calculate the target width based on that ratio
+        int targetWidth = Mathf.RoundToInt(targetHeight * aspectRatio);
 
-        Debug.Log($"Resolution set to {resolutionWidth}x{resolutionHeight}");
+        // Apply resolution in full screen mode
+        Screen.SetResolution(targetWidth, targetHeight, true);
+
+        Debug.Log($"Resolution set to: {targetWidth}x{targetHeight} | Aspect: {aspectRatio} | Native: {nativeWidth}x{nativeHeight}");
     }
+
 
     public void StartGame()
     {

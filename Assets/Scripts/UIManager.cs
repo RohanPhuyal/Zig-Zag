@@ -18,6 +18,9 @@ public class UIManager : MonoBehaviour
     //public Text levelText2;
     //public Text levelText3;
     public Text currentScore;
+    public GameObject settings;
+    public GameObject settingsPanel;
+    public Dropdown graphicsQuality;
 
     public GameObject exit;
     void Awake()
@@ -32,6 +35,9 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         highScore1.text = "High Score: " + PlayerPrefs.GetInt("highScore");
+        // Add a listener to the dropdown
+        graphicsQuality.onValueChanged.AddListener(OnDropdownValueChanged);
+        settingsPanel.SetActive(false);
         //levelText.GameObject().SetActive(true);
     }
 
@@ -42,6 +48,7 @@ public class UIManager : MonoBehaviour
     }
     public void GameStart()
     {
+        settingsPanel.SetActive(false);
         tapText.SetActive(false);
         exit.SetActive(false);
         currentScore.gameObject.SetActive(true);
@@ -65,6 +72,40 @@ public class UIManager : MonoBehaviour
     public void exitGame()
     {
         Application.Quit();
+    }
+
+    public void onSettings()
+    {
+        if(PlayerPrefs.HasKey("quality"))
+        {
+            string value = PlayerPrefs.GetString("quality");
+            for (int i = 0; i < graphicsQuality.options.Count; i++)
+            {
+                if (graphicsQuality.options[i].text == value)
+                {
+                    graphicsQuality.value = i; // Set the selected index
+                    break;
+                }
+            }
+        }
+        Debug.Log(PlayerPrefs.GetString("quality"));
+        if (settingsPanel.activeInHierarchy == false)
+        {
+            settingsPanel.SetActive(true);
+        }
+        else
+        {
+            settingsPanel.SetActive(false);
+        }
+    }
+    // The callback function for when the value changes
+    void OnDropdownValueChanged(int index)
+    {
+        // Get the selected value by index
+        string selectedValue = graphicsQuality.options[index].text;
+        PlayerPrefs.SetString("quality", selectedValue);
+
+        GameManager.instance.SetManualQualityLevel(selectedValue);
     }
 
 /*public void LevelUp()
