@@ -4,10 +4,14 @@ public class TriggerChecker : MonoBehaviour
 {
     private PlatformSpawner spawner;
     private Rigidbody rb;
+    private float releaseSpeed;
+    private float fallSpeed;
 
     public void SetSpawner(PlatformSpawner spawnerRef)
     {
         spawner = spawnerRef;
+        releaseSpeed = spawner.spawnSpeed + 0.2f;
+        fallSpeed = spawner.spawnSpeed - 0.1f;
     }
 
     private void OnTriggerExit(Collider col)
@@ -31,7 +35,7 @@ public class TriggerChecker : MonoBehaviour
         // Release platform instead of destroying it
         if (spawner != null)
         {
-            Invoke(nameof(DelayedRelease), 0.5f);
+            Invoke(nameof(DelayedRelease), releaseSpeed);
         }
     }
 

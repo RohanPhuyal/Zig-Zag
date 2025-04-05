@@ -143,6 +143,7 @@ public class BallController : MonoBehaviour
         if (GameManager.instance.gameStarted && ScoreManager.instance.score % 500 == 0 && ScoreManager.instance.score != 0)
         {
             speed++;
+            GameObject.Find("PlatformSpawner").GetComponent<PlatformSpawner>().spawnSpeed-=0.1f;
         }
     }
 
@@ -234,7 +235,7 @@ public class BallController : MonoBehaviour
             
             // Start a coroutine to handle delayed release
             StartCoroutine(DelayedReleaseCoroutine(plat, 1f));
-            Destroy(col.gameObject);
+            platformspawn.GetComponent<PlatformSpawner>().ReleaseDiamond(col.gameObject);
         }
     }
     private IEnumerator DelayedReleaseCoroutine(GameObject plat, float delay)

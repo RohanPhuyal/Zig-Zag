@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -18,6 +19,8 @@ public class PlatformSpawner : MonoBehaviour
     
     // Stores all platforms and their assigned colors
     public Dictionary<GameObject, Color> allPlatforms = new Dictionary<GameObject, Color>();
+    private Coroutine spawnCoroutine; // Reference to the coroutine for spawning platforms
+    public float spawnSpeed = 0.3f;
 
     void Start()
     {
@@ -70,21 +73,52 @@ public class PlatformSpawner : MonoBehaviour
         // Spawn initial platforms
         for (int i = 0; i < 20; i++)
         {
-            SpawnPlatforms();
+            SpawnPlatforms(true);
+        }
+    }
+    public void StartSpawningPlatforms()
+    {
+        // Start the Coroutine for spawning platforms
+        if (spawnCoroutine == null)
+        {
+            spawnCoroutine = StartCoroutine(SpawnPlatformsCoroutine());
+        }
+    }
+    public void StopSpawningPlatforms()
+    {
+        // Stop the Coroutine for spawning platforms
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
         }
     }
 
-    
+    // Coroutine to repeatedly spawn platforms
+    private IEnumerator SpawnPlatformsCoroutine()
+    {
+        // Keep spawning platforms every 0.3 seconds
+        while (!GameManager.instance.gameOver)
+        {
+            SpawnPlatforms();  // No need to pass arguments now since it's always false after initial spawn
+            yield return new WaitForSeconds(spawnSpeed);
+        }
+    }
+
+
+    /*
     public void StartSpawningPlatforms()
     {
+        // Now only spawn from the pool after the initial batch
         InvokeRepeating(nameof(SpawnPlatforms), 1f, 0.3f);
     }
+
 
     public void StopSpawningPlatforms()
     {
         CancelInvoke(nameof(SpawnPlatforms));
     }
-
+*/
     void Update()
     {
         if (GameManager.instance.gameOver)
@@ -93,18 +127,44 @@ public class PlatformSpawner : MonoBehaviour
         }
     }
 
-    void SpawnPlatforms()
+    void SpawnPlatforms(bool isInitial = false)
     {
-        int rand = Random.Range(0, 6);
-        if (rand < 3)
+        // If it's the initial spawn, manually instantiate platforms
+        if (isInitial)
         {
-            SpawnX();
+            int rand = Random.Range(0, 6);
+            if (rand < 3)
+            {
+                SpawnX();
+            }
+            else
+            {
+                SpawnZ();
+            }
         }
         else
         {
-            SpawnZ();
+            // After initial platforms, only get platforms from the pool
+            if (platformPool.CountInactive > 0)
+            {
+                int rand = Random.Range(0, 6);
+                if (rand < 3)
+                {
+                    SpawnX();
+                }
+                else
+                {
+                    SpawnZ();
+                }
+            }
+            else
+            {
+                // If there are no inactive platforms in the pool, stop spawning and log a message
+                Debug.LogWarning("Platform pool is exhausted! No more platforms available.");
+            }
         }
     }
+
 
     void SpawnX()
     {
@@ -142,9 +202,13 @@ public class PlatformSpawner : MonoBehaviour
         int rand = Random.Range(0, 7);
         if (rand < 1)
         {
-            Instantiate(diamondPrefab, pos, diamondPrefab.transform.rotation);
+            GameObject diamond = diamondPool.Get();  // Get from pool instead of instantiating
+            diamond.transform.position = pos;
+            diamond.transform.rotation = diamondPrefab.transform.rotation;
+            diamond.SetActive(true);  // Ensure the diamond is active when retrieved
         }
     }
+
 
     public void ReleasePlatform(GameObject platform)
     {
