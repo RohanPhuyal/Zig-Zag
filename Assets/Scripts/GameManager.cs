@@ -18,18 +18,61 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
         }
+        SetAutoQualityLevel();  // Call it when the game starts
+
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         gameOver = false;
         gameStarted = false;
+        
+    }
+    public void SetAutoQualityLevel()
+    {
+        int processorCount = SystemInfo.processorCount;
+        int graphicsMemory = SystemInfo.graphicsMemorySize;
+        int screenWidth = Screen.width;
+        int screenHeight = Screen.height;
+        Debug.Log("Resolution: "+screenWidth+"x"+screenHeight);
+
+        // Check for low-end devices
+        if (processorCount <= 2 && graphicsMemory <= 1024)
+        {
+            QualitySettings.SetQualityLevel(0);  // Low quality
+            Debug.Log("Low quality set.");
+            SetGameResolution(720);  // Set resolution to 720p for low quality
+        }
+        // Check for mid-range devices
+        else if (processorCount <= 4 && graphicsMemory <= 2048)
+        {
+            QualitySettings.SetQualityLevel(2);  // Medium quality
+            Debug.Log("Medium quality set.");
+            // Optionally, you can set medium resolution or stick to 1080p
+            SetGameResolution(1080);  // You could adjust to 1080p if you'd like for medium
+        }
+        // High-end devices
+        else
+        {
+            QualitySettings.SetQualityLevel(5);  // High quality
+            Debug.Log("High quality set.");
+            SetGameResolution(1080);  // Set resolution to 1080p for high quality
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void SetGameResolution(int baseResolutionHeight)
     {
-        
+        // Get the current aspect ratio of the device (width / height)
+        float aspectRatio = (float)Screen.width / Screen.height;
+
+        // Calculate the corresponding width based on the desired height while maintaining the aspect ratio
+        int resolutionHeight = baseResolutionHeight;
+        int resolutionWidth = Mathf.RoundToInt(resolutionHeight * aspectRatio);  // Ensure proper rounding
+
+        // Apply the resolution, making sure it's in portrait mode
+        Screen.SetResolution(resolutionWidth, resolutionHeight, true);
+
+        Debug.Log($"Resolution set to {resolutionWidth}x{resolutionHeight}");
     }
 
     public void StartGame()

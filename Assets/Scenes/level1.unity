@@ -2925,6 +2925,7 @@ MonoBehaviour:
   diamondPrefab: {fileID: 7642114075914900855, guid: 80ba1c235cd108a43bf924cb6291e67c, type: 3}
   gameOver: 0
   levelUp: 0
+  spawnSpeed: 0.3
 --- !u!4 &1318895546
 Transform:
   m_ObjectHideFlags: 0
@@ -4244,7 +4245,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8595064318206807609, guid: 7cbe0812423a6fb409254f731708944d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8595064318206807609, guid: 7cbe0812423a6fb409254f731708944d, type: 3}
       propertyPath: m_LocalPosition.z

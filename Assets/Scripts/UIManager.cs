@@ -49,7 +49,6 @@ public class UIManager : MonoBehaviour
     }
     public void GameOver()
     {
-        score.text = PlayerPrefs.GetInt("score").ToString();
         highScore2.text = PlayerPrefs.GetInt("highScore").ToString();
         //levelText2.text = "Level: "+ PlayerPrefs.GetInt("currentLevel").ToString();
         //levelText.GameObject().SetActive(false);
@@ -60,6 +59,7 @@ public class UIManager : MonoBehaviour
     public void updateScoreUI(int score)
     {
         currentScore.text = "Score: "+ score.ToString();
+        this.score.text= score.ToString();
     }
 
     public void exitGame()
