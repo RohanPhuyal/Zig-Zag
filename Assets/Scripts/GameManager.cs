@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
         int green = (randomComponent == 1) ? UnityEngine.Random.Range(0, 256) : UnityEngine.Random.Range(0, 2) * 255;
         int blue = (randomComponent == 2) ? UnityEngine.Random.Range(0, 256) : UnityEngine.Random.Range(0, 2) * 255;
 
+        Debug.Log("Red: " + red + " Green: " + green + " Blue: " + blue);
         // Create a new Color with randomized values (normalized to 0-1 range)
         Color newColor = new Color(red / 255f, green / 255f, blue / 255f);
         platformColor = newColor;

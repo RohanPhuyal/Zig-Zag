@@ -14,7 +14,7 @@ public class TriggerChecker : MonoBehaviour
     {
         if (col.CompareTag("Ball"))
         {
-            Invoke(nameof(FallDown), 0.5f);
+            Invoke(nameof(FallDown), 0.2f);
         }
     }
 

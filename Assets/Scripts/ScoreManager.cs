@@ -6,6 +6,8 @@ public class ScoreManager : MonoBehaviour
     public static ScoreManager instance;
     public int score;
     public int highScore;
+    [SerializeField]
+    private BallController ballController;
     //private int currentLevel;
     
     //private int levelThreshold = 200; // Score required for the next level
@@ -45,6 +47,11 @@ public class ScoreManager : MonoBehaviour
         {
             GameManager.instance.RandomizeColorFunction();
             GameManager.instance.ChangeColor();
+        }
+
+        if (score % 500 == 0)
+        {
+            ballController.IncreaseSpeed();
         }
         
         //currentLevelScore += 1;
