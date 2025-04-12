@@ -82,6 +82,8 @@ public class ScoreManager : MonoBehaviour
             PlayerPrefs.SetInt("highScore", score);
             highScore = score;
         }
+        UIManager.instance.highScore1.text = PlayerPrefs.GetInt("highScore").ToString();
+        UIManager.instance.highScore2.text = PlayerPrefs.GetInt("highScore").ToString();
     }
     
     // Check if the player has passed the level threshold

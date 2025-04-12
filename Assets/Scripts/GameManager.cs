@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     {
         gameOver = false;
         gameStarted = false;
+        AudioManager.Instance.PlayLobbyMusic();
         if(PlayerPrefs.HasKey("quality"))
         {
             Debug.Log(PlayerPrefs.GetString("quality"));
@@ -39,45 +40,58 @@ public class GameManager : MonoBehaviour
         }
     }
     public void SetAutoQualityLevel()
+{
+    int processorCount = SystemInfo.processorCount;
+    int graphicsMemory = SystemInfo.graphicsMemorySize;
+    int screenWidth = Screen.width;
+    int screenHeight = Screen.height;
+    string androidVersion = SystemInfo.operatingSystem; // e.g., "Android OS 12 / API-31"
+    
+    // Parse Android version
+    int parsedVersion = 0;
+    if (androidVersion.Contains("Android"))
     {
-        int processorCount = SystemInfo.processorCount;
-        int graphicsMemory = SystemInfo.graphicsMemorySize;
-        int screenWidth = Screen.width;
-        int screenHeight = Screen.height;
-        Debug.Log("Resolution: "+screenWidth+"x"+screenHeight);
-
-        // Check for low-end devices
-        if (processorCount <= 2 && graphicsMemory <= 1024)
+        string[] parts = androidVersion.Split(' ');
+        for (int i = 0; i < parts.Length; i++)
         {
-            Application.targetFrameRate=30;
-            UIManager.instance.graphicsQuality.value = 2;
-            PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[2].text);
-            QualitySettings.SetQualityLevel(0);  // Low quality
-            Debug.Log("Low quality set.");
-            SetGameResolution(480);  // Set resolution to 720p for low quality
-        }
-        // Check for mid-range devices
-        else if (processorCount <= 4 && graphicsMemory <= 2048)
-        {
-            Application.targetFrameRate=60;
-            UIManager.instance.graphicsQuality.value = 1;
-            PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[1].text);
-            QualitySettings.SetQualityLevel(2);  // Medium quality
-            Debug.Log("Medium quality set.");
-            // Optionally, you can set medium resolution or stick to 1080p
-            SetGameResolution(720);  // You could adjust to 1080p if you'd like for medium
-        }
-        // High-end devices
-        else
-        {
-            Application.targetFrameRate=60;
-            UIManager.instance.graphicsQuality.value = 0;
-            PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[0].text);
-            QualitySettings.SetQualityLevel(5);  // High quality
-            Debug.Log("High quality set.");
-            SetGameResolution(1080);  // Set resolution to 1080p for high quality
+            if (parts[i] == "OS" && i + 1 < parts.Length)
+            {
+                int.TryParse(parts[i + 1], out parsedVersion);
+                break;
+            }
         }
     }
+
+    Debug.Log($"Processor: {processorCount}, GPU Memory: {graphicsMemory}MB, Android Version: {parsedVersion}, Resolution: {screenWidth}x{screenHeight}");
+
+    if (processorCount < 2 || graphicsMemory < 1024 || parsedVersion < 10)
+    {
+        Application.targetFrameRate = 30;
+        UIManager.instance.graphicsQuality.value = 2;
+        PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[2].text);
+        QualitySettings.SetQualityLevel(0); // Low
+        Debug.Log("Low quality set.");
+        SetGameResolution(480);
+    }
+    else if ((processorCount < 4 && processorCount >= 2 && graphicsMemory >= 1024 && graphicsMemory < 2048) || parsedVersion < 13)
+    {
+        Application.targetFrameRate = 60;
+        UIManager.instance.graphicsQuality.value = 1;
+        PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[1].text);
+        QualitySettings.SetQualityLevel(2); // Medium
+        Debug.Log("Medium quality set.");
+        SetGameResolution(720);
+    }
+    else
+    {
+        Application.targetFrameRate = 60;
+        UIManager.instance.graphicsQuality.value = 0;
+        PlayerPrefs.SetString("quality", UIManager.instance.graphicsQuality.options[0].text);
+        QualitySettings.SetQualityLevel(5); // High
+        Debug.Log("High quality set.");
+        SetGameResolution(1080);
+    }
+}
     public void SetManualQualityLevel(string value)
     {
         int processorCount = SystemInfo.processorCount;
@@ -136,6 +150,8 @@ public class GameManager : MonoBehaviour
     {
         gameStarted = true;
         //Difficulty.instance.toggle.gameObject.SetActive(false);
+        AudioManager.Instance.PlayInGameMusic();
+        AudioManager.Instance.StartRolling();
         UIManager.instance.GameStart();
         ScoreManager.instance.StartScore();
         GameObject.Find("PlatformSpawner").GetComponent<PlatformSpawner>().StartSpawningPlatforms();
@@ -144,6 +160,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         gameStarted = false;
+        AudioManager.Instance.StopRolling();
         UIManager.instance.GameOver();
         ScoreManager.instance.StopScore();
         GameObject.Find("PlatformSpawner").GetComponent<PlatformSpawner>().StopSpawningPlatforms();

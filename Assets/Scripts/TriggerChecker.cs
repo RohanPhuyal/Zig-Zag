@@ -3,6 +3,7 @@ using UnityEngine;
 public class TriggerChecker : MonoBehaviour
 {
     private PlatformSpawner spawner;
+    private GameObject diamond;
     private Rigidbody rb;
     private float releaseSpeed;
     private float fallSpeed;
@@ -12,6 +13,10 @@ public class TriggerChecker : MonoBehaviour
         spawner = spawnerRef;
         releaseSpeed = spawner.spawnSpeed + 0.2f;
         fallSpeed = spawner.spawnSpeed - 0.1f;
+    }
+    public void SetDiamond(GameObject diamondRef)
+    {
+        diamond = diamondRef;
     }
 
     private void OnTriggerExit(Collider col)
@@ -32,6 +37,10 @@ public class TriggerChecker : MonoBehaviour
         float gravityMultiplier = 10f; // Increase this value to make gravity stronger
         Vector3 customGravity = new Vector3(0, -9.81f * gravityMultiplier, 0); // Assuming global gravity is 9.81m/s²
         rb.AddForce(customGravity, ForceMode.Acceleration);
+        if (diamond != null)
+        {
+            spawner.ReleaseDiamond(diamond);
+        }
         // Release platform instead of destroying it
         if (spawner != null)
         {
@@ -50,6 +59,7 @@ public class TriggerChecker : MonoBehaviour
     void OnDisable()
     {
         spawner = null; // Reset spawner reference when platform is deactivated
+        diamond = null;
 
         if (rb != null)
         {

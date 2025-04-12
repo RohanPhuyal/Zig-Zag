@@ -206,6 +206,8 @@ public class BallController : MonoBehaviour
     }
     void SwitchDirection()
     {
+        // On tap to change direction
+        AudioManager.Instance.PlayBallTap();
         if (moveDirection == "x")
         {
             moveDirection = "z";
