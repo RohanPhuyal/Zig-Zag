@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
             instance = this;
         }
 
+        ResetPlayerPrefsOnNewVersion();
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -39,6 +40,21 @@ public class GameManager : MonoBehaviour
             Debug.Log("AUTO QUALITY SET");
         }
     }
+    private void ResetPlayerPrefsOnNewVersion()
+    {
+        string currentVersion = "1.7";  // Your current game version
+        string savedVersion = PlayerPrefs.GetString("game_version", "");
+
+        // Reset only if the saved version is different (or doesn't exist)
+        if (savedVersion != currentVersion)
+        {
+            Debug.Log("New game version detected (" + currentVersion + "), resetting PlayerPrefs...");
+            PlayerPrefs.DeleteAll(); // Reset all saved prefs
+            PlayerPrefs.SetString("game_version", currentVersion); // Save current version
+            PlayerPrefs.Save();
+        }
+    }
+
     public void SetAutoQualityLevel()
 {
     int processorCount = SystemInfo.processorCount;

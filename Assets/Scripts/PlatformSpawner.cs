@@ -176,7 +176,7 @@ public class PlatformSpawner : MonoBehaviour
         platform.transform.position = pos;
 
         // Assign spawner reference to the platform's TriggerChecker
-        platform.GetComponentInChildren<TriggerChecker>().SetSpawner(this);
+        //platform.GetComponentInChildren<TriggerChecker>().SetSpawner(this);
 
         SpawnDiamonds(pos, platform);
     }
@@ -191,7 +191,7 @@ public class PlatformSpawner : MonoBehaviour
         platform.transform.position = pos;
 
         // Assign spawner reference to the platform's TriggerChecker
-        platform.GetComponentInChildren<TriggerChecker>().SetSpawner(this);
+        //platform.GetComponentInChildren<TriggerChecker>().SetSpawner(this);
 
         SpawnDiamonds(pos, platform);
     }
@@ -199,14 +199,18 @@ public class PlatformSpawner : MonoBehaviour
     void SpawnDiamonds(Vector3 pos, GameObject platform)
     {
         pos.y += 1;
-        int rand = Random.Range(0, 7);
+        int rand = Random.Range(0, 10);
         if (rand < 1)
         {
             GameObject diamond = diamondPool.Get();  // Get from pool instead of instantiating
             diamond.transform.position = pos;
             diamond.transform.rotation = diamondPrefab.transform.rotation;
-            platform.GetComponentInChildren<TriggerChecker>().SetDiamond(diamond);
-            diamond.SetActive(true);  // Ensure the diamond is active when retrieved
+            platform.GetComponentInChildren<TriggerChecker>().SetSpawner(this, diamond);
+        }
+        else
+        {
+            // Assign spawner reference to the platform's TriggerChecker
+            platform.GetComponentInChildren<TriggerChecker>().SetSpawner(this);
         }
     }
 

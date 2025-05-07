@@ -8,9 +8,13 @@ public class TriggerChecker : MonoBehaviour
     private float releaseSpeed;
     private float fallSpeed;
 
-    public void SetSpawner(PlatformSpawner spawnerRef)
+    public void SetSpawner(PlatformSpawner spawnerRef, GameObject diamondRef=null)
     {
         spawner = spawnerRef;
+        if (diamondRef != null)
+        {
+            diamond = diamondRef;
+        }
         releaseSpeed = spawner.spawnSpeed + 0.2f;
         fallSpeed = spawner.spawnSpeed - 0.1f;
     }
@@ -37,10 +41,6 @@ public class TriggerChecker : MonoBehaviour
         float gravityMultiplier = 10f; // Increase this value to make gravity stronger
         Vector3 customGravity = new Vector3(0, -9.81f * gravityMultiplier, 0); // Assuming global gravity is 9.81m/s²
         rb.AddForce(customGravity, ForceMode.Acceleration);
-        if (diamond != null)
-        {
-            spawner.ReleaseDiamond(diamond);
-        }
         // Release platform instead of destroying it
         if (spawner != null)
         {
@@ -50,6 +50,10 @@ public class TriggerChecker : MonoBehaviour
 
     private void DelayedRelease()
     {
+        if (diamond != null)
+        {
+            spawner.ReleaseDiamond(diamond);
+        }
         if (spawner != null)
         {
             spawner.ReleasePlatform(transform.parent.gameObject);
